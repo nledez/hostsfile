@@ -31,19 +31,16 @@ action :create do
     Chef::Log.debug "#{new_resource} already exists - overwriting."
   end
 
-  hostsfile.add(
-    ip_address: new_resource.ip_address,
-    hostname:   new_resource.hostname,
-    aliases:    new_resource.aliases,
-    comment:    new_resource.comment,
-    priority:   new_resource.priority,
-    unique:     new_resource.unique,
-  )
-
-  if hostsfile.content_changed?
-    converge_by("Create #{new_resource}") { hostsfile.save }
-  else
-    Chef::Log.info "#{new_resource} content already matches - nothing to do."
+  converge_by("Create #{new_resource}") do
+    hostsfile.add(
+      ip_address: new_resource.ip_address,
+      hostname:   new_resource.hostname,
+      aliases:    new_resource.aliases,
+      comment:    new_resource.comment,
+      priority:   new_resource.priority,
+      unique:     new_resource.unique,
+    )
+    hostsfile.save
   end
 end
 
@@ -74,28 +71,8 @@ action :append do
     Chef::Log.info "#{new_resource} does not exist - creating instead."
   end
 
-  hostsfile.append(
-    ip_address: new_resource.ip_address,
-    hostname:   new_resource.hostname,
-    aliases:    new_resource.aliases,
-    comment:    new_resource.comment,
-    priority:   new_resource.priority,
-    unique:     new_resource.unique,
-  )
-
-  if hostsfile.content_changed?
-    converge_by("Append #{new_resource}") { hostsfile.save }
-  else
-    Chef::Log.info "#{new_resource} content already matches - nothing to do."
-  end
-end
-
-# Updates the given hosts file entry. Does nothing if the entry does not
-# exist.
-action :update do
-  if hostsfile.contains?(new_resource)
-
-    hostsfile.update(
+  converge_by("Append #{new_resource}") do
+    hostsfile.append(
       ip_address: new_resource.ip_address,
       hostname:   new_resource.hostname,
       aliases:    new_resource.aliases,
@@ -103,11 +80,24 @@ action :update do
       priority:   new_resource.priority,
       unique:     new_resource.unique,
     )
+    hostsfile.save
+  end
+end
 
-    if hostsfile.content_changed?
-      converge_by("Update #{new_resource}") { hostsfile.save }
-    else
-      Chef::Log.info "#{new_resource} content already matches - nothing to do."
+# Updates the given hosts file entry. Does nothing if the entry does not
+# exist.
+action :update do
+  if hostsfile.contains?(new_resource)
+    converge_by("Update #{new_resource}") do
+      hostsfile.update(
+        ip_address: new_resource.ip_address,
+        hostname:   new_resource.hostname,
+        aliases:    new_resource.aliases,
+        comment:    new_resource.comment,
+        priority:   new_resource.priority,
+        unique:     new_resource.unique,
+      )
+      hostsfile.save
     end
   else
     Chef::Log.info "#{new_resource} does not exist - skipping update."
@@ -128,11 +118,10 @@ action :remove do
 end
 
 private
-
-# The hostsfile object
-#
-# @return [Manipulator]
-#   the manipulator for this hostsfile
-def hostsfile
-  @hostsfile ||= Manipulator.new(node)
-end
+  # The hostsfile object
+  #
+  # @return [Manipulator]
+  #   the manipulator for this hostsfile
+  def hostsfile
+    @hostsfile ||= Manipulator.new(node)
+  end

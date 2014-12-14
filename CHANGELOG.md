@@ -1,34 +1,7 @@
 hostsfile Cookbook CHANGELOG
 =======================
-This file is used to list changes made in each version of the hostsfile cookbook.
-
-
-v2.4.5 (2014-06-24)
--------------------
-- Fix notifications and why-run mode
-
-
-v2.4.4 (2014-02-25)
--------------------
-- Bump Berkshelf version
-- Remove scope pieces from IPv6 addresses
-
-
-v2.4.3 (2014-02-01)
--------------------
-
-- Package custom ChefSpec matchers
-- Update testing harness
-- Avoid using `Chef::Application.fatal!`
-- Use Chef::Resource::File for atomic updates
-
-
-v2.4.2
-------
-- Fix Travis CI integration
-- Remove newline characters
-- Allow specifying a custom hostsfile path
-
+This file
+ is used to list changes made in each version of the hostsfile cookbook.
 
 v2.4.1
 ------
